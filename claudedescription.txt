@@ -1,0 +1,158 @@
+# Cloud & AI Buddy Programme — Full Technical Brief
+
+## Purpose
+A self-service pairing tool for large teams to connect around shared cloud and AI interests. People can pair as peers (same experience level) or as mentor/mentee (different levels). Pairing is always intentional and topic-driven — never random. Groups are not capped at two people; multiple people can share a topic group.
+
+---
+
+## Tech stack
+- **React** (functional components, hooks only — useState, useEffect, useCallback)
+- **No external libraries** — all styling is inline JS objects, no CSS framework
+- **Persistent shared storage** via `window.storage` (a Claude artifact API — get/set with a `true` flag for shared scope)
+- **Storage key:** `buddy_v15` — bump this to force a fresh default load
+- **Default data** seeds one group: Ed L and James R, both Intermediate, on "UX / Front-End AI Tooling"
+
+---
+
+## Data model
+
+```js
+{
+  topics: string[],          // master list of all available topics
+  entries: [                 // people waiting for a buddy
+    { id: number, name: string, topic: string, level: "Beginner"|"Intermediate"|"Expert" }
+  ],
+  groups: [                  // confirmed pairings/groups
+    { id: number, topic: string, members: [{ name: string, level: string }] }
+  ]
+}
+```
+
+**Key rules:**
+- A group must always have 2+ members. If a member is removed and only 1 remains, that person is moved to `entries` automatically.
+- `entries` and `groups` are independent — joining a group must never mutate entries.
+- All mutations go through a `persist()` function that writes to shared storage.
+- On load, a `sanitise()` function validates the parsed JSON before use to guard against malformed data.
+
+---
+
+## Topic taxonomy
+
+Two hard-coded category arrays (15 topics each) used for grouping and display — not stored in the data model:
+
+**Cloud:** AWS, Azure, Cloud Migration, Cloud Networking, Cloud Security & DevSecOps, Cloud Storage & Databases, Data Engineering, FinOps & Cloud Cost Management, Google Cloud Platform, Infrastructure as Code, Kubernetes & Containers, Multi-Cloud Strategy, Platform Engineering, Serverless Architecture, Site Reliability Engineering (SRE)
+
+**AI:** AI Agents & Automation, AI Ethics & Governance, AI in Cybersecurity, Computer Vision, Data Science & Analytics, Fine-tuning & Model Adaptation, Generative AI for Business, Large Language Models (LLMs), Machine Learning Fundamentals, MLOps & Model Deployment, Natural Language Processing (NLP), Prompt Engineering, Responsible AI, Retrieval-Augmented Generation (RAG), UX / Front-End AI Tooling
+
+Topics added via the UI are pushed into the appropriate category array at runtime and appended to `data.topics`. Custom topics that don't match either category array fall into an "Other" bucket.
+
+---
+
+## Views
+
+### Tab 1 — Active Pairings
+- Shows all confirmed groups, grouped by topic
+- Each topic card has a coloured dot (consistent colour derived from topic index), a Cloud/AI/Other label, and a "N waiting" pill if entries exist for that topic
+- Within each topic, groups are shown as a row of member cards (name + avatar + level badge)
+- Each group has a "+ Join group" button and each member has a × remove button
+- Removing the second-to-last member triggers orphan promotion to entries
+- Pairing type label ("Peer" or "Mentor / Mentee") shown above each group, derived from whether all members share the same level
+
+### Tab 2 — Looking for a Buddy
+- Persistent banner at top: "Looking for a buddy?" with a primary "+ Add Myself" button
+- Lists all waiting entries grouped by topic
+- Each person shows name, avatar, level badge, and a "Pair with [first name]" button
+- Pairing with someone creates a new group and removes that specific entry (by ID — not by topic)
+
+Both tabs show counts in the tab label e.g. "Active Pairings **1**".
+
+---
+
+## Header
+- Dark gradient hero (`#111827` → `#1e1b4b`)
+- Title and description
+- "+ Add Myself" outline button and ↺ reset button
+- Stats row:
+  - "N People waiting for a buddy or mentor" chip
+  - Divider
+  - Clickable "Cloud (15)" and "AI (15)" chips — clicking opens the Topic Panel for that category
+- Topic Panel is a modal sheet showing all topics in the category with activity counts, and an inline "Add a topic" flow at the bottom
+
+---
+
+## Filter bar (below tabs, collapsed by default)
+- "Show/Hide filters" toggle button — expands a panel that pushes content down
+- When filters are active, a badge count appears on the collapsed button
+- Filter panel has two sections:
+  - **Topic** — chip per active topic (those with real activity), grouped under Cloud / AI headings
+  - **Experience Level** — Beginner / Intermediate / Expert chips
+- Filters apply to both tabs simultaneously
+- "Clear all" link and a results summary ("X of Y shown") appear inline when filters are active
+- Empty states adapt: "No pairings match your filters" vs "No active pairings yet"
+
+---
+
+## Modals
+All three modals share the same `Modal` component which:
+- Closes on **Escape** key
+- Closes on **backdrop click**
+- Centres vertically in the viewport with 16px margin on all sides
+- Scrolls internally if content overflows
+
+**Add Myself** — name input, topic select (grouped optgroups, starts with "Select a topic" placeholder, no default), level select. Submit disabled until both name and topic are filled.
+
+**Join Group** — name input, level select. Shows the topic name. Submit disabled until name is filled. Only mutates the target group — never touches entries.
+
+**Pair with [name]** — shows the target person's avatar + level. Name input, level select. Shows a contextual hint ("Peer pairing" or "Mentor/mentee — you as mentor/mentee"). Submit disabled until name is filled.
+
+---
+
+## Components
+
+| Component | Role |
+|---|---|
+| `App` | Root — all state, storage, mutations |
+| `TopicCard` | Pairing view card for a single topic |
+| `TopicHeader` | Shared header row for topic cards in both views |
+| `TopicPanel` | Modal sheet listing all topics in a category with add-topic flow |
+| `EmptyState` | Reusable empty state with optional "Clear filters" link |
+| `Modal` | Centred dialog with Escape/backdrop close |
+| `Badge` | Level pill (colour-coded: blue/amber/green) |
+| `Avatar` | Initials circle with consistent colour per name |
+| `Btn` | Button with variants: primary, outline, accent, ghost |
+| `Field` | Label + input wrapper |
+| `FilterChip` | Toggle chip for filter panel |
+
+---
+
+## Accessibility
+- WCAG AA contrast ratios on all text/background combinations
+- `aria-label` on icon-only buttons (×, remove)
+- `role="status"` and `aria-live="polite"` on toast
+- `role="dialog"` and `aria-modal="true"` on modals
+- Disabled states use `opacity: 0.45` + `cursor: not-allowed`
+- Tab-scrollable on mobile via `overflow-x: auto`
+
+---
+
+## Responsive behaviour
+Breakpoint at `600px` via an injected `<style>` block:
+- Hero actions stack vertically, buttons full-width
+- Stats row stacks vertically
+- Tabs scroll horizontally
+- Member cards stack full-width
+- Available banner stacks vertically
+- Entry rows wrap
+
+---
+
+## Known limitations / improvement areas
+- No real authentication — anyone can remove anyone
+- Names are free text with no deduplication
+- No notification or email when someone pairs with you
+- Storage is shared globally (all users of the artifact see the same data)
+- No admin panel or moderation tools
+- No search within topics
+- No way to leave a group gracefully (only hard remove)
+- No timestamps on pairings
+- `window.storage` is Claude-artifact-specific and must be replaced for any real deployment
