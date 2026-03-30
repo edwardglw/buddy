@@ -8,8 +8,8 @@ and see suggested learning resources per topic.
 ## Tech stack
 - React 19 + Vite 8, plain JS (no TypeScript)
 - **No CSS libraries** — inline styles only throughout
-- GitHub Pages deployment: `npm run deploy` → https://edwardglw.github.io/buddy/
-- GitHub repo: https://github.com/edwardglw/buddy
+- GitHub Pages deployment: `npm run deploy` → https://edwardglw.github.io/cloud-ai-buddy/
+- GitHub repo: https://github.com/edwardglw/cloud-ai-buddy
 - Figma file key: F7UaHtjA6HdTRSbyrtfP2v
 
 ## Design system
@@ -66,8 +66,8 @@ src/
 - FALLBACK_LINKS used for custom topics
 
 ## Windows dev notes
-- Run dev server: `npm run dev` from `C:\Users\Ed\Desktop\AIprojects\buddy`
-- Open: http://127.0.0.1:5173/buddy/
+- Run dev server: `npm run dev` from `C:\Users\Ed\Desktop\AIprojects\cloud-ai-buddy`
+- Open: http://127.0.0.1:5173/cloud-ai-buddy/
 - vite.config.js has `host: '127.0.0.1'` — required on Windows (IPv6 binding causes blank page)
 - PowerShell execution policy fix if needed: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
 

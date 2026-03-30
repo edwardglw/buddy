@@ -30,7 +30,12 @@ function CardHeader({ topic, groups, allTopics, cloudTopics, aiTopics, isLearnin
       <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
         <button
           onClick={onShowLearning}
-          style={{ ...btnPrimary, fontSize: 11, padding: '4px 10px', background: isLearningActive ? '#d94002' : '#fc4c02' }}
+          style={{
+            fontSize: 11, padding: '4px 10px', borderRadius: 8, fontWeight: 600, cursor: 'pointer',
+            border: isLearningActive ? '1.5px solid #fc4c02' : '1.5px solid #d1d5db',
+            background: isLearningActive ? '#fff3ee' : '#fff',
+            color: isLearningActive ? '#fc4c02' : '#374151',
+          }}
         >
           VIEW SUGGESTED LEARNING ›
         </button>

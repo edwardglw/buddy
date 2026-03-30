@@ -23,7 +23,7 @@ export const AI_TOPICS = [
   'Generative AI for Business','Large Language Models (LLMs)',
   'Machine Learning Fundamentals','MLOps & Model Deployment',
   'Natural Language Processing (NLP)','Prompt Engineering','Responsible AI',
-  'Retrieval-Augmented Generation (RAG)','UX / Front-End AI Tooling',
+  'Retrieval-Augmented Generation (RAG)','LLM UX/UI & Front End Engineering',
 ]
 
 export const ALL_TOPICS = [...CLOUD_TOPICS, ...AI_TOPICS]
@@ -233,12 +233,12 @@ export const LINKS = {
     { title: 'RAG Survey Paper', url: 'https://arxiv.org/abs/2312.10997', description: 'Comprehensive academic survey covering RAG architectures, retrieval techniques, and evaluation methods.' },
     { title: 'Weaviate RAG Guide', url: 'https://weaviate.io/learn/recipes/rag', description: "Practical recipes for building production RAG pipelines using Weaviate's vector database." },
   ],
-  'UX / Front-End AI Tooling': [
-    { title: 'Vercel v0', url: 'https://v0.dev', description: 'AI-powered UI generation tool that produces React components from natural language descriptions.' },
-    { title: 'Figma AI Features', url: 'https://www.figma.com/ai/', description: "Figma's built-in AI tools for auto-layout, content generation, and design-to-code workflows." },
-    { title: 'GitHub Copilot', url: 'https://github.com/features/copilot', description: 'AI code assistant that accelerates front-end development with context-aware, in-editor code suggestions.' },
-    { title: 'Framer AI', url: 'https://www.framer.com/ai', description: 'No-code website builder with AI-assisted layout and content generation for rapid prototyping.' },
-    { title: 'Builder.io AI', url: 'https://www.builder.io/ai', description: 'Visual development platform using AI to convert designs and screenshots into production-ready code.' },
+  'LLM UX/UI & Front End Engineering': [
+    { title: 'Google PAIR Guidebook', url: 'https://pair.withgoogle.com/guidebook', description: "Google's People + AI Research guidebook — practical UX patterns and principles for designing AI-powered products." },
+    { title: 'Vercel AI SDK Docs', url: 'https://sdk.vercel.ai/docs', description: 'Learn to build streaming AI chat interfaces and LLM-powered UIs in React and Next.js with hands-on examples.' },
+    { title: 'NN/g AI UX Research', url: 'https://www.nngroup.com/topic/ai-ux/', description: 'Research-backed articles from Nielsen Norman Group on designing usable, trustworthy AI user experiences.' },
+    { title: 'Full Stack Deep Learning', url: 'https://fullstackdeeplearning.com', description: 'Practical course covering the full lifecycle of building and deploying LLM-powered applications end to end.' },
+    { title: 'Anthropic — Build with Claude', url: 'https://docs.anthropic.com/en/docs/build-with-claude/overview', description: 'Official guidance on integrating Claude into applications, including UX patterns for chat, tool use, and streaming.' },
   ],
 }
 
@@ -289,7 +289,7 @@ export const DEFAULT_DATA = {
   groups: [
     {
       id: 1,
-      topic: 'UX / Front-End AI Tooling',
+      topic: 'LLM UX/UI & Front End Engineering',
       members: [
         { name: 'Ed L', level: 'Intermediate' },
         { name: 'James R', level: 'Intermediate' },
