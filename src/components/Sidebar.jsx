@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getColour, inputStyle, btnPrimary } from '../data.js'
+import { getColour } from '../data.js'
 
 function SidebarTopic({ topic, allTopics, active, count, onClick }) {
   return (
@@ -62,19 +62,7 @@ function AccordionSection({ label, topics, allTopics, groups, filterTopic, setFi
   )
 }
 
-export default function Sidebar({ cloudTopics, aiTopics, allTopics, groups, filterTopic, setFilterTopic, onAddTopic, onClose }) {
-  const [adding, setAdding] = useState(false)
-  const [newTopic, setNewTopic] = useState('')
-  const [newCategory, setNewCategory] = useState('Cloud')
-
-  function submitNewTopic() {
-    if (newTopic.trim()) {
-      onAddTopic(newCategory, newTopic.trim())
-      setNewTopic('')
-      setAdding(false)
-    }
-  }
-
+export default function Sidebar({ cloudTopics, aiTopics, allTopics, groups, filterTopic, setFilterTopic, onClose }) {
   return (
     <aside style={{ width: 236, flexShrink: 0, padding: '24px 0 24px 16px', display: 'flex', flexDirection: 'column' }}>
       <div style={{
@@ -88,48 +76,6 @@ export default function Sidebar({ cloudTopics, aiTopics, allTopics, groups, filt
             <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 20, lineHeight: 1, padding: '2px 6px' }}>×</button>
           </div>
         )}
-
-        {/* Add topic */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', flexShrink: 0 }}>
-          {adding ? (
-            <div>
-              <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-                {['Cloud', 'AI'].map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setNewCategory(cat)}
-                    style={{
-                      flex: 1, padding: '5px 0', fontSize: 12, fontWeight: 600,
-                      border: `1.5px solid ${newCategory === cat ? '#fc4c02' : '#e5e7eb'}`,
-                      borderRadius: 8, cursor: 'pointer',
-                      background: newCategory === cat ? '#fff3ee' : '#fff',
-                      color: newCategory === cat ? '#fc4c02' : '#6b7280',
-                    }}
-                  >{cat}</button>
-                ))}
-              </div>
-              <input
-                autoFocus
-                value={newTopic}
-                onChange={e => setNewTopic(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') submitNewTopic()
-                  if (e.key === 'Escape') { setAdding(false); setNewTopic('') }
-                }}
-                placeholder="Topic name..."
-                style={{ ...inputStyle, fontSize: 13, padding: '8px 10px', marginBottom: 8 }}
-              />
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={submitNewTopic} style={{ ...btnPrimary, flex: 1, fontSize: 12, padding: '6px 0' }}>+ ADD ›</button>
-                <button onClick={() => { setAdding(false); setNewTopic('') }} style={{ flex: 1, background: '#f3f4f6', color: '#6b7280', border: 'none', borderRadius: 8, padding: '6px 0', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              </div>
-            </div>
-          ) : (
-            <button onClick={() => setAdding(true)} style={{ ...btnPrimary, width: '100%', fontSize: 12, padding: '8px 0' }}>
-              + ADD TOPIC ›
-            </button>
-          )}
-        </div>
 
         {/* All topics button */}
         <button

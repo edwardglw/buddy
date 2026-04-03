@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { DEFAULT_DATA, btnPrimary } from './data.js'
 import { useWindowWidth } from './hooks/useWindowWidth.js'
 import Sidebar from './components/Sidebar.jsx'
-import { TopicCard } from './components/TopicCard.jsx'
+import { GroupCard } from './components/TopicCard.jsx'
 import LearningPanel from './components/LearningPanel.jsx'
 import { AddMyselfModal, PairWithModal, JoinGroupModal, ConfirmRemoveModal } from './components/Modals.jsx'
 
@@ -68,7 +68,6 @@ export default function App() {
 
   const sortedGroups = [...data.groups].sort((a, b) => b.id - a.id)
   const visibleGroups = filterTopic ? sortedGroups.filter(g => g.topic === filterTopic) : sortedGroups
-  const activeTopics = [...new Set(visibleGroups.map(g => g.topic))]
 
   const sidebarEl = (
     <Sidebar
@@ -78,7 +77,6 @@ export default function App() {
       groups={data.groups}
       filterTopic={filterTopic}
       setFilterTopic={(t) => { setFilterTopic(t); if (!isWide) setFilterOpen(false) }}
-      onAddTopic={addTopic}
       onClose={!isWide ? () => setFilterOpen(false) : undefined}
     />
   )
@@ -89,9 +87,12 @@ export default function App() {
         <h2 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 6 }}>
           Welcome to the Cloud &amp; AI Buddy Programme
         </h2>
-        <p style={{ fontSize: 14, color: '#6b7280' }}>
-          Join a topic group, pair with someone within a topic group or add yourself to start a new group.
+        <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 12 }}>
+          Join an existing group, pair with someone, or create your own group for any topic.
         </p>
+        <button onClick={() => setModal({ type: 'addMyself' })} style={{ ...btnPrimary, fontSize: 13 }}>
+          + CREATE A NEW GROUP ›
+        </button>
       </div>
 
       {filterTopic && (
@@ -103,31 +104,32 @@ export default function App() {
         </div>
       )}
 
-      {activeTopics.length === 0 ? (
+      {visibleGroups.length === 0 ? (
         <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e7eb', padding: '48px 32px', textAlign: 'center' }}>
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fff3ee', border: '2px solid #fcd9c8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 26 }}>🤝</div>
           <p style={{ fontSize: 17, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
-            {filterTopic ? `No groups for "${filterTopic}"` : 'No groups yet'}
+            {filterTopic ? `No groups for "${filterTopic}" yet` : 'No groups yet'}
           </p>
-          <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>Be the first — add yourself to a topic and get matched.</p>
-          <button onClick={() => setModal({ type: 'addMyself' })} style={{ ...btnPrimary }}>
-            + ADD MYSELF ›
+          <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>
+            {filterTopic ? 'Be the first to create a group for this topic.' : 'Be the first — create a group to get started.'}
+          </p>
+          <button onClick={() => setModal({ type: 'addMyself', defaultTopic: filterTopic || undefined })} style={{ ...btnPrimary }}>
+            {filterTopic ? `+ CREATE A GROUP FOR "${filterTopic}" ›` : '+ CREATE A NEW GROUP ›'}
           </button>
         </div>
       ) : (
-        activeTopics.map(topic => (
-          <TopicCard
-            key={topic}
-            topic={topic}
-            groups={visibleGroups.filter(g => g.topic === topic)}
+        visibleGroups.map(group => (
+          <GroupCard
+            key={group.id}
+            group={group}
             allTopics={allTopics}
             cloudTopics={data.cloudTopics}
             aiTopics={data.aiTopics}
-            onJoin={group => setModal({ type: 'joinGroup', payload: group })}
+            onJoin={g => setModal({ type: 'joinGroup', payload: g })}
             onPairWith={entry => setModal({ type: 'pairWith', payload: entry })}
             onRemoveMember={requestRemoveMember}
-            onShowLearning={() => setLearningTopic(learningTopic === topic ? null : topic)}
-            isLearningActive={learningTopic === topic}
+            onShowLearning={() => setLearningTopic(learningTopic === group.topic ? null : group.topic)}
+            isLearningActive={learningTopic === group.topic}
           />
         ))
       )}
@@ -144,6 +146,9 @@ export default function App() {
           alt=""
           style={{ position: 'absolute', top: 0, right: 0, height: '100%', width: 'auto', display: 'block', pointerEvents: 'none' }}
         />
+        {!isWide && (
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(17,24,39,0.82)', zIndex: 0, pointerEvents: 'none' }} />
+        )}
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '20px 24px', position: 'relative', zIndex: 1 }}>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: -0.5, marginBottom: 6 }}>
             Cloud &amp; AI Buddy Programme
@@ -151,19 +156,16 @@ export default function App() {
           <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 16 }}>
             Connect with peers and mentors across cloud and AI topics. Pair, learn, share, grow.
           </p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setModal({ type: 'addMyself' })} style={{ ...btnPrimary, fontSize: 13 }}>
-              + ADD MYSELF ›
-            </button>
-            {!isWide && (
+          {!isWide && (
+            <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => setFilterOpen(true)}
                 style={{ ...btnPrimary, fontSize: 13, background: '#374151' }}
               >
                 ☰ FILTER
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -262,7 +264,7 @@ export default function App() {
 
       {/* Modals */}
       {modal?.type === 'addMyself' && (
-        <AddMyselfModal cloudTopics={data.cloudTopics} aiTopics={data.aiTopics} onClose={() => setModal(null)} onSubmit={handleAddMyself} onAddTopic={addTopic} />
+        <AddMyselfModal cloudTopics={data.cloudTopics} aiTopics={data.aiTopics} onClose={() => setModal(null)} onSubmit={handleAddMyself} onAddTopic={addTopic} defaultTopic={modal.defaultTopic} />
       )}
       {modal?.type === 'joinGroup' && (
         <JoinGroupModal group={modal.payload} onClose={() => setModal(null)} onSubmit={handleJoinGroup} />

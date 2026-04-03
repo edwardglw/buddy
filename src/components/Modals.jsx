@@ -4,12 +4,12 @@ import { Modal, Field } from './Modal.jsx'
 import Avatar from './Avatar.jsx'
 import Badge from './Badge.jsx'
 
-export function AddMyselfModal({ cloudTopics, aiTopics, onClose, onSubmit, onAddTopic }) {
+export function AddMyselfModal({ cloudTopics, aiTopics, onClose, onSubmit, onAddTopic, defaultTopic }) {
   const [name, setName] = useState('')
   const [level, setLevel] = useState('Intermediate')
   const [topicMode, setTopicMode] = useState('select')
   // select mode
-  const [selectedTopic, setSelectedTopic] = useState('')
+  const [selectedTopic, setSelectedTopic] = useState(defaultTopic || '')
   // create mode
   const [newCategory, setNewCategory] = useState('Cloud')
   const [newTopicName, setNewTopicName] = useState('')
@@ -30,7 +30,7 @@ export function AddMyselfModal({ cloudTopics, aiTopics, onClose, onSubmit, onAdd
   }
 
   return (
-    <Modal title="Add Myself" onClose={onClose}>
+    <Modal title="Create a New Group" onClose={onClose}>
       <Field label="Your name (First name + last initial, e.g. Ed L)">
         <input
           style={{ ...inputStyle, borderColor: name && !nameValid ? '#e63946' : '#e5e7eb' }}
@@ -110,7 +110,7 @@ export function AddMyselfModal({ cloudTopics, aiTopics, onClose, onSubmit, onAdd
           onClick={handleSubmit}
           style={{ ...btnPrimary, opacity: canSubmit ? 1 : 0.45, cursor: canSubmit ? 'pointer' : 'not-allowed' }}
         >
-          ADD ME ›
+          CREATE GROUP ›
         </button>
       </div>
     </Modal>
