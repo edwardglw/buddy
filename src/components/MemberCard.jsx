@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Avatar from './Avatar.jsx'
 import Badge from './Badge.jsx'
 
-export default function MemberCard({ member, onRemove }) {
+export default function MemberCard({ member, canRemove, onRemove }) {
   const [hovered, setHovered] = useState(false)
   return (
     <div
@@ -21,7 +21,7 @@ export default function MemberCard({ member, onRemove }) {
         <div style={{ fontWeight: 600, fontSize: 14, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{member.name}</div>
         <div style={{ marginTop: 4 }}><Badge level={member.level} /></div>
       </div>
-      {hovered && (
+      {hovered && canRemove && (
         <button
           onClick={e => { e.stopPropagation(); onRemove() }}
           aria-label={`Remove ${member.name}`}

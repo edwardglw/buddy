@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { btnPrimary } from './data.js'
 import { useAppData } from './hooks/useAppData.js'
+import { useClientId } from './hooks/useClientId.js'
 import { useWindowWidth } from './hooks/useWindowWidth.js'
 import Sidebar from './components/Sidebar.jsx'
 import { GroupCard } from './components/TopicCard.jsx'
@@ -10,6 +11,7 @@ import { AddMyselfModal, PairWithModal, JoinGroupModal, ConfirmRemoveModal } fro
 
 export default function App() {
   const { data, persist } = useAppData()
+  const myClientId = useClientId()
   const [modal, setModal] = useState(null)
   const [filterTopic, setFilterTopic] = useState(null)
   const [learningTopic, setLearningTopic] = useState(null)
@@ -37,7 +39,7 @@ export default function App() {
   function handleAddMyself({ name, topic, level }) {
     persist({
       ...data,
-      groups: [...data.groups, { id: Date.now(), topic, members: [{ name, level }], createdAt: Date.now() }],
+      groups: [...data.groups, { id: Date.now(), topic, members: [{ name, level, clientId: myClientId }], createdAt: Date.now() }],
     })
     setModal(null)
   }
@@ -55,13 +57,13 @@ export default function App() {
 
   function handleJoinGroup(groupId, member) {
     const group = data.groups.find(g => g.id === groupId)
-    persist({ ...data, groups: data.groups.map(g => g.id === groupId ? { ...g, members: [...g.members, member] } : g) })
+    persist({ ...data, groups: data.groups.map(g => g.id === groupId ? { ...g, members: [...g.members, { ...member, clientId: myClientId }] } : g) })
     setModal(null)
     setToast({ name: member.name, topic: group?.topic })
   }
 
   function handlePairWith(entry, me) {
-    persist({ ...data, groups: data.groups.map(g => g.id === entry.id ? { ...g, members: [...g.members, me] } : g) })
+    persist({ ...data, groups: data.groups.map(g => g.id === entry.id ? { ...g, members: [...g.members, { ...me, clientId: myClientId }] } : g) })
     setModal(null)
     setToast({ name: me.name, topic: entry.topic })
   }
@@ -130,6 +132,7 @@ export default function App() {
             allTopics={allTopics}
             cloudTopics={data.cloudTopics}
             aiTopics={data.aiTopics}
+            myClientId={myClientId}
             onJoin={g => setModal({ type: 'joinGroup', payload: g })}
             onPairWith={entry => setModal({ type: 'pairWith', payload: entry })}
             onRemoveMember={requestRemoveMember}

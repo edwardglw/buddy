@@ -1,7 +1,7 @@
 import { getColour, pairingType, btnPrimary } from '../data.js'
 import MemberCard from './MemberCard.jsx'
 
-export function GroupCard({ group, allTopics, cloudTopics, aiTopics, onJoin, onPairWith, onRemoveMember, onShowLearning, isLearningActive }) {
+export function GroupCard({ group, allTopics, cloudTopics, aiTopics, myClientId, onJoin, onPairWith, onRemoveMember, onShowLearning, isLearningActive }) {
   const { topic, members } = group
   const colour = getColour(topic, allTopics)
   const category = cloudTopics.includes(topic) ? 'Cloud' : aiTopics.includes(topic) ? 'AI' : 'Custom'
@@ -52,7 +52,7 @@ export function GroupCard({ group, allTopics, cloudTopics, aiTopics, onJoin, onP
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {members.map((member, mi) => (
-            <MemberCard key={mi} member={member} onRemove={() => onRemoveMember(group.id, mi)} />
+            <MemberCard key={mi} member={member} canRemove={member.clientId === myClientId} onRemove={() => onRemoveMember(group.id, mi)} />
           ))}
         </div>
       </div>
