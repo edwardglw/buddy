@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { DEFAULT_DATA, btnPrimary } from './data.js'
+import { btnPrimary } from './data.js'
+import { useAppData } from './hooks/useAppData.js'
 import { useWindowWidth } from './hooks/useWindowWidth.js'
 import Sidebar from './components/Sidebar.jsx'
 import { GroupCard } from './components/TopicCard.jsx'
@@ -8,7 +9,7 @@ import { AddMyselfModal, PairWithModal, JoinGroupModal, ConfirmRemoveModal } fro
 
 
 export default function App() {
-  const [data, setData] = useState(DEFAULT_DATA)
+  const { data, persist } = useAppData()
   const [modal, setModal] = useState(null)
   const [filterTopic, setFilterTopic] = useState(null)
   const [learningTopic, setLearningTopic] = useState(null)
@@ -18,9 +19,13 @@ export default function App() {
   const width = useWindowWidth()
   const isWide = width >= 900
 
-  const allTopics = [...data.cloudTopics, ...data.aiTopics]
+  if (!data) return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f2f5', color: '#6b7280', fontSize: 15 }}>
+      Connecting…
+    </div>
+  )
 
-  function persist(newData) { setData({ ...newData }) }
+  const allTopics = [...data.cloudTopics, ...data.aiTopics]
 
   function addTopic(category, name) {
     if (!name) return
